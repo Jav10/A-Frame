@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+		<title>A-Frame**PingPong</title>	
+	</head>
+	<body >
+		<a-scene>
+			<!--<a-light color="blue" position="-1 1 -8"></a-light>-->
+			<!--derecha,izquierda,abajo,arriba-->
+			<a-camera position="3 1 -1" rotation="0 -180 0" wasd-controls-enabled="false" look-controls-enabled="true"></a-camera>
+			<a-sky color="skyblue"></a-sky>
+			<a-box position="6 0 6" color="green" depth="8.2" height="0.1" width="0.2"></a-box>
+			<a-box position="0 0 6" color="green" depth="8.2" height="0.1" width="0.2"></a-box>
+			<a-box position="3 0 10" color="green" depth="0.2" height="0.1" width="6.2"></a-box>
+			<a-box position="3 0 2" color="green" depth="0.2" height="0.1" width="6.2"></a-box>
+			<a-box id="raqueta" position="3 0 3" color="skyblue" depth="0.2" height="0.1" width="1.5"></a-box>
+			<a-sphere id="pelota" position="3 0.08 6" color="orange" radius="0.1"></a-sphere>
+			<a-plane position="3 -0.001 6" rotation="-89.954 179.900 0" color="#CCC" height="8" width="6"></a-plane>
+			<a-text position="5 2 10" rotation="-5 176.5 0" scale="3.5 3.5 3" value="Puntos: 0" color="red"></a-text>
+			<!--<a-sphere position="2.25 0 3" color="red" radius="0.1"></a-sphere>-->			
+		</a-scene>
+		<script>
+			var x1=3;
+			var x2 = 3;
+			var z1=6;
+			var z2 = 3;
+			var arriba = true;
+			var derecha = true;
+			var vel = 50;
+			var tecla = 0;
+			var Rmove=true;
+			var puntos = 0;
+			var num = Math.floor((Math.random() * 2) + 1);
+			if(num==1){
+				arriba = !arriba;
+			}
+			num = Math.floor((Math.random() * 2) + 1);
+			if(num==2){
+				derecha = !derecha;
+			}
+			//Función para iniciar el juego
+			function Start(){
+			//Puntuación
+			
+			//colision raqueta vs pelota
+				if(((x1>=(x2-0.75)) && (x1<=(x2+0.75))) && ((z1>=3)&&(z1<=3.2))){
+					arriba = !arriba;
+					puntos+=10;
+				}
+			//Condición para perder
+				if(z1<3){
+					clearInterval(start);
+				}	
+			//movimiento pelota
+				if(arriba){
+					z1+=0.1;
+					if(z1>=9.7){
+						arriba = !arriba;
+					}
+				}
+				else{
+					z1-=0.1;
+					if(z1<=2.3){
+						arriba = !arriba;
+					}
+				}
+				if(derecha){
+					x1+=0.1;
+					if(x1>=5.7){
+						derecha = !derecha;
+					}
+				}
+				else{
+					x1-=0.1;
+					if(x1<=0.3){
+						derecha = !derecha;
+					}
+				}
+				//Seleccionar pelota
+				var Escena = document.querySelector('a-scene');
+				var Pelota = Escena.querySelector('#pelota');
+				Pelota.setAttribute('position', x1+' 0.08 '+z1);
+				
+				//Seleccionar raqueta
+				var Raqueta = Escena.querySelector('#raqueta');
+				
+				document.addEventListener('keydown', function (event) {
+					tecla = event.keyCode;
+					if(tecla==65 || tecla==97){
+					   Rmove = false;
+					}
+					if(tecla==68 || tecla==100){
+					   Rmove = true;
+					}
+				});
+				//Movimiento raqueta
+				if(Rmove){
+					x2-=0.1;
+					if(x2<=0.9){
+						Rmove = false;
+					}
+				}
+				else{
+					x2+=0.1;
+					if(x2>=5){
+						Rmove = true;
+					}
+				}
+				Raqueta.setAttribute('position', x2+' 0 '+z2);
+				tecla = 0;
+				//Puntuación
+				var texto = Escena.querySelector('a-text');
+				texto.setAttribute('value','Puntos: '+puntos);
+				
+			}
+			/*
+			var nivel = parseInt(prompt("Dame un nivel: 1,2,3 ó 4"));
+			if(nivel==1){
+				vel = 200;
+			}
+			else if(nivel==2){
+				vel = 150;
+			}
+			else if(nivel==3){
+				vel = 80;
+			}
+			else{
+				vel = 1;
+			}
+			*/
+			var start = setInterval(Start, vel);
+		</script>
+	</body>
+</html>
