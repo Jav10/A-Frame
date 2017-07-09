@@ -6,10 +6,11 @@
 	</head>
 	<body >
 		<a-scene>
-			
+			<a-assets>
+				<audio id="pong" src="pong.mp3" preload="auto"></audio>
+			</a-assets>
 			<a-camera position="3 5 -3.7" rotation="-18 -180 0" wasd-controls-enabled="false" look-controls-enabled="true"></a-camera>
 			<a-sky color="black"></a-sky>
-			<!--shader="flat" atributo para que no afecte la luz al objeto -->
 			<!--Base Abajo, derecha,izquierda,arriba,abajo-->
 			<a-box position="6 0 4" color="white" depth="4" height="0.2" width="0.2"></a-box>
 			<a-box position="0 0 4" color="white" depth="4" height="0.2" width="0.2"></a-box>
@@ -28,22 +29,18 @@
 			<!--Raqueta-->
 			<a-box id="raqueta" position="3 0 4" color="#fff" depth="1" height="0.5" width="1"></a-box>
 			<!--Pelota-->
-			<a-sphere id="pelota" position="3 1 4" color="yellow" radius="0.1">
+			<a-sphere id="pelota" position="3 1 4" color="yellow" radius="0.1" sound="src: #pong">
 				<a-light type="point" decay="1.2" color="yellow" intensity="4" distance="8" angle="90" target="#piso" position="0 0 0"></a-light>
 			</a-sphere>
+			<a-circle color="red" position="3 0.016 4" rotation="-90 180 0" radius="0.025"></a-circle>
 			<!--Piso-->
 			<a-plane id="piso" position="3 -0.001 4" rotation="-89.954 179.900 0" color="black" height="4" width="6"></a-plane>
-			<a-plane position="3 -0.003 4" rotation="-89.954 179.900 0" color="black" height="20" width="20"></a-plane>
+			<a-plane position="3 -0.003 4" rotation="-89.954 179.900 0" color="black" height="55" width="55"></a-plane>
 			<!--Textos-->
 			<a-text position="5 2 10" rotation="0 180 0" scale="3.5 3.5 3.5" value="Puntos: 0" color="white"></a-text>
 			<a-text position="5 2 8.5" rotation="0 180 0" scale="2 2 2" value="Controles: A,W,D,S" color="white"></a-text>
 			<a-text position="6 2 7.5" rotation="0 180 0" scale="2 2 2" value="Iniciar: Enter - Reiniciar: Espacio" color="white"></a-text>
-			<!--<a-sphere position="2.25 0 3" color="red" radius="0.1"></a-sphere>	
-			<a-light type="directional" distance="2" angle="180" intensity="10" color="red" position="0.4 4.7 5.7"></a-light> 
-			<a-light type="point" distance="2" angle="180" intensity="10" color="red" position="-0.744 1.238 4.860"></a-light>
-			<a-light type="point" distance="2" angle="180" intensity="30" color="black" position="6.9 1.238 4.860"></a-light>  
-			<a-light type="point" distance="9" angle="180" intensity="30" color="black" position="3 6.238 7.313"></a-light>
-			<a-light type="point" distance="9" angle="180" intensity="30" color="blue" position="3 6.238 7.313"></a-light> -->
+			<!--Modelos -->
 			<a-collada-model position="-1.335 0 2.642" rotation="0 -150 0" scale="2 2 2" src="king-warian-wrynn.dae"></a-collada-model>
 			<a-collada-model position="7.085 0 2.642"  rotation="0 150 0" scale="2 2 2" src="king-warian-wrynn.dae"></a-collada-model>
 			<a-collada-model position="3 6 3.8"  rotation="0 165 0" src="dragon.dae" scale="0.5 0.5 0.5"></a-collada-model>		
@@ -58,11 +55,18 @@
 			var izquierda = true;
 			var derecha = true;
 			var arriba = true;
-			var vel = 50;
+			var vel = 0.1;
 			var tecla = 0;
 			var Lmove = true;
 			var Rmove = true;
 			var puntos = 0;
+			var L1=5.7;
+			var L2=2.2;
+			var L3=5.7;
+			var L4=0.2;
+			var L5=5.7;
+			var L6=0.1;
+			var centinelaA = 50;
 			//Rebote de inicio aleatorio
 			var num = Math.floor((Math.random() * 2) + 1);
 			if(num==1){
@@ -74,102 +78,129 @@
 			}
 			//Función para iniciar el juego
 			function Start(){
+				//Seleccionar Objetos
+				var Escena = document.querySelector('a-scene');
+				var Pelota = Escena.querySelector('#pelota');
+				var Senal = Escena.querySelector('a-circle');
+				var Raqueta = Escena.querySelector('#raqueta');
 			//colision raqueta vs pelota  && ((y1>=0.335) && (y1<0.355))
-				if(((x1>=(x2-0.5)) && (x1<=(x2+0.5))) && ((z1>=(z2-0.5)) && (z1<=(z2+0.5))) && ((y1>=0.3) && (y1<0.36)) ){
+				if(((x1>=(x2-0.55)) && (x1<=(x2+0.55))) && ((z1>=(z2-0.55)) && (z1<=(z2+0.55))) && ((y1>=0.3) && (y1<0.36)) ){
 					arriba = !arriba;
+					//Sonido pelota
+				    Pelota.components.sound.playSound();
 					puntos+=10;
 				}
+			//Aumento velocidad Pelota //Nuevo
+				if(puntos==centinelaA){
+					vel=0.3;
+					L1-=0.2;
+					L2+=0.2;
+					L3-=0.2;
+					L4+=0.2;
+					centinelaA=100;
+				}
+				if(puntos==centinelaA){
+					vel=0.5;
+					L1-=0.2;
+					L2+=0.2;
+					L3-=0.2;
+					L4+=0.2;
+					centinelaA=200;
+				}
+				if(puntos==centinelaA){
+					vel=0.8;
+					L1-=0.3;
+					L2+=0.3;
+					L3-=0.3;
+					L4+=0.3;
+					centinelaA=0;
+				}	
 			//Condición para perder
 				if(y1<0.25){
 					clearInterval(start);
-					opcion = null;
 				}
 			//movimiento pelota
 				if(izquierda){
 					z1+=0.1;
-					if(z1>=5.7){
+					if(z1>=L1){
 						izquierda = !izquierda;
+						//Sonido pelota
+				       Pelota.components.sound.playSound();
 					}
 				}
 				else{
 					z1-=0.1;
-					if(z1<=2.2){
+					if(z1<=L2){
 						izquierda = !izquierda;
+						//Sonido pelota
+				        Pelota.components.sound.playSound();
 					}
 				}
 				if(derecha){
 					x1+=0.1;
-					if(x1>=5.7){
+					if(x1>=L3){
 						derecha = !derecha;
+						//Sonido pelota
+				        Pelota.components.sound.playSound();
 					}
 				}
 				else{
 					x1-=0.1;
-					if(x1<=0.2){
+					if(x1<=L4){
 						derecha = !derecha;
+						//Sonido pelota
+				        Pelota.components.sound.playSound();
 					}
 				}
 				if(arriba){
 					y1+=0.1;
-					if(y1>=5.8){
+					if(y1>=L5){
 						arriba = !arriba;
+						//Sonido pelota
+				        Pelota.components.sound.playSound();
 					}
 				}
 				else{
 					y1-=0.1;
-					if(y1<=0.1){
+					if(y1<=L6){
 						arriba = !arriba;
+						//Sonido pelota
+				        Pelota.components.sound.playSound();
 					}
 				}
-				//Seleccionar pelota
-				var Escena = document.querySelector('a-scene');
-				var Pelota = Escena.querySelector('#pelota');
+				//Pelota Posicion
 				Pelota.setAttribute('position', x1+' '+y1+' '+z1);
-				//var Luz = Escena.querySelector('a-light');
-				//Luz.setAttribute('position', x1+' '+y1+' '+z1);
-				//Seleccionar raqueta
-				var Raqueta = Escena.querySelector('#raqueta');
-					//Mover raqueta
+				//Posicion Señal
+				Senal.setAttribute('position', x1+' 0.016 '+z1);
+				//Mover raqueta
 				document.addEventListener('keydown', function (event) {
 					tecla = event.keyCode;
-					if(tecla==65 || tecla==97){
-					   Rmove = true;
-					}
-					if(tecla==68 || tecla==100){
-					   Rmove = false;
-					}
-					if(tecla==87|| tecla==119){
-						Lmove = true;
-					}
-					if(tecla== 83|| tecla==115){
-						Lmove = false;
-					}
 				});
 				//Movimiento raqueta
-				if(Lmove){
-					z2+=0.1;
-					if(z2>=5.3){
-						Lmove = !Lmove;
+				if(tecla==65 || tecla==97){
+					   x2+=0.5;
+					   if(x2>=5.3){
+						  x2=5.3;
+					   }
 					}
-				}
-				else{
-					z2-=0.1;
-					if(z2<=2.6){
-						Lmove = !Lmove;
+					if(tecla==68 || tecla==100){
+					   x2-=0.5;
+						if(x2<=0.6){
+							x2=0.6;
+						}
 					}
-				}
-				if(Rmove){
-					x2+=0.1;
-					if(x2>=5.3){
-						Rmove = !Rmove;
+					if(tecla==87|| tecla==119){
+						z2+=0.5;
+						if(z2>=5.3){
+						z2=5.3;
 					}
-				}
-				else{
-					x2-=0.1;
-					if(x2<=0.6){
-						Rmove = !Rmove;
 					}
-				}
+					if(tecla== 83|| tecla==115){
+						z2-=0.5;
+						if(z2<=2.6){
+							z2=2.6;
+					    }
+					}
 				Raqueta.setAttribute('position', x2+' 0 '+z2);
 				tecla = 0;
 				//Puntuación
@@ -178,23 +209,9 @@
 				
 			}
 			var teclado;
-			var opcion = 0;
 			document.addEventListener('keydown', function (event) {
 				teclado = event.keyCode;
 				if(teclado==13){
-					x1=3;
-					x2 = 3;
-					y1 = 1; 
-					z1=4;
-					z2 = 4; 
-					izquierda = true;
-					derecha = true;
-					arriba = true;
-					vel = 50;
-					tecla = 0;
-					Lmove = true;
-					Rmove = true;
-					puntos = 0;
 					var num = Math.floor((Math.random() * 2) + 1);
 					if(num==1){
 						izquierda = !izquierda;
@@ -203,10 +220,7 @@
 					if(num==2){
 						derecha = !derecha;
 					}
-					if(opcion == null){
-						clearInterval(start);
-					}
-				   setInterval(Start,50);
+				   setInterval(Start,1);
 				}
 				if(teclado == 32){
 					location.reload();
